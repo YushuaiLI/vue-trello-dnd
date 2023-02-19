@@ -1,7 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import TrelloBoard from "./components/TrelloBoard.vue";
+</script>
 
 <template>
-  <h1 class="text-red-900 mt-12">Hello world</h1>
+  <div class="p-10 h-[100vh] bg-teal-600 overflow-auto">
+    <TrelloBoard />
+  </div>
 </template>
 
 <style scoped></style>
