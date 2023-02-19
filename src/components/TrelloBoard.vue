@@ -13,7 +13,7 @@ const isDragging = ref(false);
 
 const proxiedColumns = computed({
   get() {
-    return store.columns;
+    return store.columns.value;
   },
   set(cols) {
     store.updateColumns(cols);
@@ -36,6 +36,7 @@ const proxiedColumns = computed({
       <TrelloBoardColumn
         :column="column"
         @task:created="store.addTaskToColumn"
+        @tasks:updated="(tasks) => store.updateTasks(column.id, tasks)"
       ></TrelloBoardColumn>
     </template>
   </Draggable>

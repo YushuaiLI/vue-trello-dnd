@@ -1,10 +1,11 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import type { Column } from "@/types";
+import type { Column, Task } from "@/types";
 import { nanoid } from "nanoid";
+import { computed } from "vue";
 
 export const useBoardStore = defineStore("board", () => {
-  const columns = ref<Column[]>([
+  const _columns = ref<Column[]>([
     {
       id: "1",
       title: "Selected",
@@ -19,8 +20,10 @@ export const useBoardStore = defineStore("board", () => {
     { id: "4", title: "Complete", tasks: [] },
   ]);
 
+  const columns = computed(() => _columns);
+
   const addTaskToColumn = (title: string, id: Column["id"]) => {
-    const column = columns.value.find((c) => c.id === id);
+    const column = _columns.value.find((c) => c.id === id);
 
     if (!column) return;
 
@@ -32,8 +35,16 @@ export const useBoardStore = defineStore("board", () => {
   };
 
   const updateColumns = (cols: Column[]) => {
-    columns.value = cols;
+    _columns.value = cols;
   };
 
-  return { columns, addTaskToColumn, updateColumns };
+  const updateTasks = (colId: Column["id"], tasks: Task[]) => {
+    const column = _columns.value.find((c) => c.id === colId);
+
+    if (!column) return;
+
+    column.tasks = tasks;
+  };
+
+  return { columns, addTaskToColumn, updateColumns, updateTasks };
 });
