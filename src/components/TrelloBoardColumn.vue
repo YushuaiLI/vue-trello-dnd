@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Column } from "@/types";
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 import TrelloBoardTask from "./TrelloBoardTask.vue";
 import { onClickOutside } from "@vueuse/core";
 
@@ -20,6 +20,9 @@ onClickOutside(inputRef, () => {
 
 const onAddTask = () => {
   enableEditing();
+  nextTick(() => {
+    inputRef.value?.focus();
+  });
 };
 
 const onAdded = (id: Column["id"]) => {
@@ -42,10 +45,12 @@ const resetInput = () => (newTaskTitle.value = "");
     <TrelloBoardTask v-for="task in column.tasks" :key="task.id" :task="task" />
     <footer>
       <input
+        placeholder="Task title.."
         ref="inputRef"
         v-show="isEditing"
         v-model="newTaskTitle"
         @keyup.enter="onAdded(column.id)"
+        class="bg-white p-2 mb-2 rounded shadow-sm w-full"
       />
       <button v-show="!isEditing" @click="onAddTask">+ Add Task</button>
     </footer>
