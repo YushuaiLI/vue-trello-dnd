@@ -3,6 +3,7 @@ import type { Column } from "@/types";
 import { nextTick, ref } from "vue";
 import TrelloBoardTask from "./TrelloBoardTask.vue";
 import { onClickOutside } from "@vueuse/core";
+import { DRAG_HANDLE_CLASS } from "@/constants/ui";
 
 defineProps<{ column: Column }>();
 
@@ -39,6 +40,7 @@ const resetInput = () => (newTaskTitle.value = "");
 <template>
   <div class="bg-gray-200 p-5 rounded min-w-[250px]">
     <header class="font-bold mb-4">
+      <span :class="DRAG_HANDLE_CLASS" class="cursor-move">⠇</span>
       {{ column.title }}
     </header>
     <TrelloBoardTask

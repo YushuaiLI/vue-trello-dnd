@@ -5,11 +5,6 @@ defineProps<{
   task: Task;
   columnId: Column["id"];
 }>();
-
-// defineEmits<{
-//   (e: "drag:start"): void;
-//   (e: "drag:end"): void;
-// }>();
 </script>
 
 <template>
