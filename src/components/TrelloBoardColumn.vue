@@ -106,19 +106,19 @@ const resetColTitleInput = () => (title.value = props.column.title);
       v-model="proxiedTasks"
     >
       <template #item="{ element: task }: { element: Task }">
-        <div>
+        <div id="task-wrapper">
           <TrelloBoardTask :key="task.id" :task="task" :column-id="column.id" />
         </div>
       </template>
     </Draggable>
     <footer>
-      <input
-        placeholder="Task title.."
+      <textarea
+        placeholder="Enter a title for this task"
         ref="inputTaskTitleRef"
         v-show="isEditing"
         v-model="newTaskTitle"
         @keyup.enter="onAdded(column.id)"
-        class="bg-white p-2 mb-2 rounded shadow-sm w-full"
+        class="bg-white p-2 mb-2 rounded shadow-sm w-full outline-none"
       />
       <button class="text-gray-500" v-show="!isEditing" @click="onAddTask">
         + Add Task
@@ -128,11 +128,11 @@ const resetColTitleInput = () => (title.value = props.column.title);
 </template>
 
 <style>
-.sortable-chosen > div {
+#task-wrapper.sortable-chosen > div {
   transform: rotate(5deg);
 }
 
-.sortable-ghost > div {
+#task-wrapper.sortable-ghost > div {
   transform: rotate(0);
 }
 </style>

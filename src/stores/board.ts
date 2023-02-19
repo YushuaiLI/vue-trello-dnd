@@ -37,6 +37,13 @@ export const useBoardStore = defineStore("board", {
         createdAt: new Date(),
       });
     },
+    addColumn(colTitle: string) {
+      this.columns.push({
+        title: colTitle,
+        id: nanoid(),
+        tasks: [],
+      });
+    },
     updateCols(cols: Column[]) {
       this.columns = cols;
     },
