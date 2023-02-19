@@ -2,20 +2,33 @@
 import type { Column, Task } from "@/types";
 import { computed, nextTick, ref } from "vue";
 import TrelloBoardTask from "./TrelloBoardTask.vue";
-import { onClickOutside } from "@vueuse/core";
+import { onClickOutside, useKeyModifier } from "@vueuse/core";
 import { DRAG_HANDLE_CLASS } from "@/constants/ui";
 import Draggable from "vuedraggable";
+
+/**
+ * Props and Emits
+ */
 
 const props = defineProps<{ column: Column }>();
 
 const emit = defineEmits<{
-  (e: "task:created", title: string, id: Column["id"]): void;
+  (e: "tasks:created", title: string, id: Column["id"]): void;
   (e: "tasks:updated", tasks: Task[]): void;
+  (e: "column:update-title", title: string, id: Column["id"]): void;
 }>();
 
-const inputRef = ref<HTMLInputElement | null>(null);
+/**
+ * Reactive State
+ */
+
 const newTaskTitle = ref("");
+const inputTaskTitleRef = ref<HTMLInputElement | null>(null);
 const isEditing = ref(false);
+
+const title = ref(props.column.title);
+const inputColTitleRef = ref<HTMLInputElement | null>(null);
+const isEditingColTitle = ref(false);
 
 const proxiedTasks = computed({
   get() {
@@ -26,48 +39,82 @@ const proxiedTasks = computed({
   },
 });
 
-onClickOutside(inputRef, () => {
+/**
+ * DOM Handlers
+ */
+
+const alt = useKeyModifier("Alt");
+
+onClickOutside(inputTaskTitleRef, () => {
   disableEditing();
 });
+
+onClickOutside(inputColTitleRef, () => {
+  disableEditingColTitle();
+  resetColTitleInput();
+});
+
+/**
+ * Methods
+ */
 
 const onAddTask = () => {
   enableEditing();
   nextTick(() => {
-    inputRef.value?.focus();
+    inputTaskTitleRef.value?.focus();
   });
 };
 
 const onAdded = (id: Column["id"]) => {
-  emit("task:created", newTaskTitle.value, id);
+  emit("tasks:created", newTaskTitle.value, id);
   disableEditing();
-  resetInput();
+  resetTaskTitleInput();
+};
+
+const onUpdateTitle = () => {
+  emit("column:update-title", title.value, props.column.id);
 };
 
 const disableEditing = () => (isEditing.value = false);
 const enableEditing = () => (isEditing.value = true);
-const resetInput = () => (newTaskTitle.value = "");
+const resetTaskTitleInput = () => (newTaskTitle.value = "");
+const disableEditingColTitle = () => (isEditingColTitle.value = false);
+const enableEditingColTitle = () => (isEditingColTitle.value = true);
+const resetColTitleInput = () => (title.value = props.column.title);
 </script>
 
 <template>
   <div class="bg-gray-200 p-5 rounded min-w-[250px]">
-    <header class="font-bold mb-4">
+    <header class="font-bold mb-4 flex gap-x-2">
       <span :class="DRAG_HANDLE_CLASS" class="cursor-move">⠇</span>
-      {{ column.title }}
+      <h3 v-if="!isEditingColTitle" @dblclick="enableEditingColTitle">
+        {{ column.title }}
+      </h3>
+      <input
+        v-else
+        ref="inputColTitleRef"
+        type="text"
+        v-model="title"
+        @keyup.enter="onUpdateTitle"
+        class="font-bold mb-4"
+      />
     </header>
     <Draggable
       :animation="250"
-      group="tasks"
+      :group="{ name: 'tasks', pull: alt ? 'clone' : true }"
       item-key="id"
       v-model="proxiedTasks"
     >
       <template #item="{ element: task }: { element: Task }">
-        <TrelloBoardTask :key="task.id" :task="task" :column-id="column.id" />
+        <div>
+          <TrelloBoardTask :key="task.id" :task="task" :column-id="column.id" />
+        </div>
       </template>
     </Draggable>
     <footer>
       <input
         placeholder="Task title.."
-        ref="inputRef"
+        ref="inputTaskTitleRef"
         v-show="isEditing"
         v-model="newTaskTitle"
         @keyup.enter="onAdded(column.id)"
@@ -79,3 +126,13 @@ const resetInput = () => (newTaskTitle.value = "");
     </footer>
   </div>
 </template>
+
+<style>
+.sortable-chosen > div {
+  transform: rotate(5deg);
+}
+
+.sortable-ghost > div {
+  transform: rotate(0);
+}
+</style>

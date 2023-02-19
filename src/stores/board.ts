@@ -1,11 +1,13 @@
-import { ref } from "vue";
 import { defineStore } from "pinia";
 import type { Column, Task } from "@/types";
 import { nanoid } from "nanoid";
-import { computed } from "vue";
 
-export const useBoardStore = defineStore("board", () => {
-  const _columns = ref<Column[]>([
+type State = {
+  columns: Column[];
+};
+
+const initialState: State = {
+  columns: [
     {
       id: "1",
       title: "Selected",
@@ -18,33 +20,43 @@ export const useBoardStore = defineStore("board", () => {
     { id: "2", title: "In Progress", tasks: [] },
     { id: "3", title: "QA", tasks: [] },
     { id: "4", title: "Complete", tasks: [] },
-  ]);
+  ],
+};
 
-  const columns = computed(() => _columns);
+export const useBoardStore = defineStore("board", {
+  state: (): State => initialState,
+  actions: {
+    addTask(title: string, id: Column["id"]) {
+      const column = findColumn(this.columns, id);
 
-  const addTaskToColumn = (title: string, id: Column["id"]) => {
-    const column = _columns.value.find((c) => c.id === id);
+      if (!column) return;
 
-    if (!column) return;
+      column.tasks.push({
+        id: nanoid(),
+        title,
+        createdAt: new Date(),
+      });
+    },
+    updateCols(cols: Column[]) {
+      this.columns = cols;
+    },
+    updateTasks(id: Column["id"], tasks: Task[]) {
+      const column = findColumn(this.columns, id);
 
-    column.tasks.push({
-      id: nanoid(),
-      title,
-      createdAt: new Date(),
-    });
-  };
+      if (!column) return;
 
-  const updateColumns = (cols: Column[]) => {
-    _columns.value = cols;
-  };
+      column.tasks = tasks;
+    },
+    updateColTitle(title: string, id: Column["id"]) {
+      const column = findColumn(this.columns, id);
 
-  const updateTasks = (colId: Column["id"], tasks: Task[]) => {
-    const column = _columns.value.find((c) => c.id === colId);
+      if (!column) return;
 
-    if (!column) return;
-
-    column.tasks = tasks;
-  };
-
-  return { columns, addTaskToColumn, updateColumns, updateTasks };
+      column.title = title;
+    },
+  },
 });
+
+function findColumn(cols: Column[], id: Column["id"]): Column | undefined {
+  return cols.find((col) => col.id === id);
+}
