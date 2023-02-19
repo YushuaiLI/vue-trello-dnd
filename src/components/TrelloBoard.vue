@@ -1,43 +1,19 @@
 <script lang="ts" setup>
-import type { Column } from "@/types";
-import { ref } from "vue";
-import { nanoid } from "nanoid";
+import TrelloBoardColumn from "./TrelloBoardColumn.vue";
+import { useBoardStore } from "@/stores/board";
 
-const columns = ref<Column[]>([
-  {
-    id: nanoid(),
-    title: "Selected",
-    tasks: [{ id: nanoid(), title: "Random String", createdAt: new Date() }],
-  },
-  {
-    id: nanoid(),
-    title: "In Progress",
-    tasks: [],
-  },
-  {
-    id: nanoid(),
-    title: "QA",
-    tasks: [],
-  },
-  {
-    id: nanoid(),
-    title: "Complete",
-    tasks: [],
-  },
-]);
+const store = useBoardStore();
 </script>
 
 <template>
   <div class="flex gap-4 overflow-x-auto items-start py-8">
-    <div
-      v-for="column in columns"
+    <TrelloBoardColumn
+      v-for="column in Object.keys(store.columns).map(
+        (key) => store.columns[key]
+      )"
       :key="column.id"
-      class="bg-gray-200 p-5 rounded min-w-[250px]"
-    >
-      <header>
-        {{ column.title }}
-      </header>
-      <p v-for="task in column.tasks" :key="task.id">{{ task.title }}</p>
-    </div>
+      :column="column"
+      @task:created="store.addTaskToColumn"
+    ></TrelloBoardColumn>
   </div>
 </template>
