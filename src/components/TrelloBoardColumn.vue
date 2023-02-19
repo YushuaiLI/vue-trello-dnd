@@ -38,11 +38,15 @@ const resetInput = () => (newTaskTitle.value = "");
 
 <template>
   <div class="bg-gray-200 p-5 rounded min-w-[250px]">
-    <header>
+    <header class="font-bold mb-4">
       {{ column.title }}
     </header>
-
-    <TrelloBoardTask v-for="task in column.tasks" :key="task.id" :task="task" />
+    <TrelloBoardTask
+      v-for="task in column.tasks"
+      :key="task.id"
+      :task="task"
+      :column-id="column.id"
+    />
     <footer>
       <input
         placeholder="Task title.."
@@ -52,7 +56,9 @@ const resetInput = () => (newTaskTitle.value = "");
         @keyup.enter="onAdded(column.id)"
         class="bg-white p-2 mb-2 rounded shadow-sm w-full"
       />
-      <button v-show="!isEditing" @click="onAddTask">+ Add Task</button>
+      <button class="text-gray-500" v-show="!isEditing" @click="onAddTask">
+        + Add Task
+      </button>
     </footer>
   </div>
 </template>

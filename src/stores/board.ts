@@ -1,15 +1,11 @@
-import { reactive } from "vue";
+import { ref } from "vue";
 import { defineStore } from "pinia";
 import type { Column } from "@/types";
 import { nanoid } from "nanoid";
 
-type Store = {
-  [columndId: Column["id"]]: Column;
-};
-
 export const useBoardStore = defineStore("board", () => {
-  const store = reactive<Store>({
-    "1": {
+  const columns = ref<Column[]>([
+    {
       id: "1",
       title: "Selected",
       tasks: [
@@ -18,18 +14,26 @@ export const useBoardStore = defineStore("board", () => {
         { id: nanoid(), title: "Task 3", createdAt: new Date() },
       ],
     },
-    "2": { id: "2", title: "In Progress", tasks: [] },
-    "3": { id: "3", title: "QA", tasks: [] },
-    "4": { id: "4", title: "Complete", tasks: [] },
-  });
+    { id: "2", title: "In Progress", tasks: [] },
+    { id: "3", title: "QA", tasks: [] },
+    { id: "4", title: "Complete", tasks: [] },
+  ]);
 
   const addTaskToColumn = (title: string, id: Column["id"]) => {
-    store[id].tasks.push({
+    const column = columns.value.find((c) => c.id === id);
+
+    if (!column) return;
+
+    column.tasks.push({
       id: nanoid(),
       title,
       createdAt: new Date(),
     });
   };
 
-  return { columns: store, addTaskToColumn };
+  const updateColumns = (cols: Column[]) => {
+    columns.value = cols;
+  };
+
+  return { columns, addTaskToColumn, updateColumns };
 });

@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import type { Task } from "@/types";
+import type { Column, Task } from "@/types";
 
 defineProps<{
   task: Task;
+  columnId: Column["id"];
 }>();
+
+// defineEmits<{
+//   (e: "drag:start"): void;
+//   (e: "drag:end"): void;
+// }>();
 </script>
 
 <template>
