@@ -3,13 +3,12 @@ import type { Column, Task } from "@/types";
 import { computed, nextTick, ref } from "vue";
 import TrelloBoardTask from "./TrelloBoardTask.vue";
 import { onClickOutside, useKeyModifier } from "@vueuse/core";
-import { DRAG_HANDLE_CLASS } from "@/constants/ui";
 import Draggable from "vuedraggable";
+import ColumnHeader from "./ColumnHeader.vue";
 
 /**
  * Props and Emits
  */
-
 const props = defineProps<{ column: Column }>();
 
 const emit = defineEmits<{
@@ -21,14 +20,9 @@ const emit = defineEmits<{
 /**
  * Reactive State
  */
-
 const newTaskTitle = ref("");
 const inputTaskTitleRef = ref<HTMLInputElement | null>(null);
 const isEditing = ref(false);
-
-const title = ref(props.column.title);
-const inputColTitleRef = ref<HTMLInputElement | null>(null);
-const isEditingColTitle = ref(false);
 
 const proxiedTasks = computed({
   get() {
@@ -42,22 +36,15 @@ const proxiedTasks = computed({
 /**
  * DOM Handlers
  */
-
 const alt = useKeyModifier("Alt");
 
 onClickOutside(inputTaskTitleRef, () => {
   disableEditing();
 });
 
-onClickOutside(inputColTitleRef, () => {
-  disableEditingColTitle();
-  resetColTitleInput();
-});
-
 /**
  * Methods
  */
-
 const onAddTask = () => {
   enableEditing();
   nextTick(() => {
@@ -71,34 +58,18 @@ const onAdded = (id: Column["id"]) => {
   resetTaskTitleInput();
 };
 
-const onUpdateTitle = () => {
-  emit("column:update-title", title.value, props.column.id);
+const onUpdateTitle = (title: string) => {
+  emit("column:update-title", title, props.column.id);
 };
 
 const disableEditing = () => (isEditing.value = false);
 const enableEditing = () => (isEditing.value = true);
 const resetTaskTitleInput = () => (newTaskTitle.value = "");
-const disableEditingColTitle = () => (isEditingColTitle.value = false);
-const enableEditingColTitle = () => (isEditingColTitle.value = true);
-const resetColTitleInput = () => (title.value = props.column.title);
 </script>
 
 <template>
   <div class="bg-gray-200 p-5 rounded min-w-[250px]">
-    <header class="font-bold mb-4 flex gap-x-2">
-      <span :class="DRAG_HANDLE_CLASS" class="cursor-move">⠇</span>
-      <h3 v-if="!isEditingColTitle" @dblclick="enableEditingColTitle">
-        {{ column.title }}
-      </h3>
-      <input
-        v-else
-        ref="inputColTitleRef"
-        type="text"
-        v-model="title"
-        @keyup.enter="onUpdateTitle"
-        class="font-bold mb-4"
-      />
-    </header>
+    <ColumnHeader :column="props.column" @column:update-title="onUpdateTitle" />
     <Draggable
       :animation="250"
       :group="{ name: 'tasks', pull: alt ? 'clone' : true }"
