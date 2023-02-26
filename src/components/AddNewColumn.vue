@@ -32,13 +32,13 @@ const onColumnAdd = () => {
   <div class="bg-gray-200 p-8 min-w-[250px]">
     <input
       v-show="isEditing"
+      ref="inputRef"
+      v-model="newColumn"
       class="py-2 px-4"
       type="text"
       placeholder="Enter column name"
-      v-model="newColumn"
       @keyup.enter="onColumnAdd"
       @blur="isEditing = false"
-      ref="inputRef"
     />
     <button v-show="!isEditing" @click="onAddClick">+ Add Column</button>
   </div>

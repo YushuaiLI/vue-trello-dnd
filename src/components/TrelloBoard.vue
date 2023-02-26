@@ -7,6 +7,8 @@ import type { Column } from "@/types";
 import { DRAG_HANDLE_CLASS } from "@/constants/ui";
 import AddNewColumnVue from "./AddNewColumn.vue";
 
+// false positive
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type DraggableItem = { element: Column };
 
 const store = useBoardStore();
@@ -24,11 +26,11 @@ const proxiedColumns = computed({
 <template>
   <div class="flex gap-4 overflow-x-auto items-start py-8">
     <Draggable
+      v-model="proxiedColumns"
       :animation="250"
       :handle="'.' + DRAG_HANDLE_CLASS"
       group="columns"
       item-key="id"
-      v-model="proxiedColumns"
       class="flex gap-4"
     >
       <template #item="{ element: column }: DraggableItem">

@@ -71,10 +71,10 @@ const resetTaskTitleInput = () => (newTaskTitle.value = "");
   <div class="bg-gray-200 p-5 rounded min-w-[250px]">
     <ColumnHeader :column="props.column" @column:update-title="onUpdateTitle" />
     <Draggable
+      v-model="proxiedTasks"
       :animation="250"
       :group="{ name: 'tasks', pull: alt ? 'clone' : true }"
       item-key="id"
-      v-model="proxiedTasks"
     >
       <template #item="{ element: task }: { element: Task }">
         <div id="task-wrapper">
@@ -84,14 +84,14 @@ const resetTaskTitleInput = () => (newTaskTitle.value = "");
     </Draggable>
     <footer>
       <textarea
-        placeholder="Enter a title for this task"
-        ref="inputTaskTitleRef"
         v-show="isEditing"
+        ref="inputTaskTitleRef"
         v-model="newTaskTitle"
-        @keyup.enter="onAdded(column.id)"
+        placeholder="Enter a title for this task"
         class="bg-white p-2 mb-2 rounded shadow-sm w-full outline-none"
+        @keyup.enter="onAdded(column.id)"
       />
-      <button class="text-gray-500" v-show="!isEditing" @click="onAddTask">
+      <button v-show="!isEditing" class="text-gray-500" @click="onAddTask">
         + Add Task
       </button>
     </footer>

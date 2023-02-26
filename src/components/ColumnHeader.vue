@@ -41,10 +41,10 @@ const resetColTitleInput = () => (colTitle.value = props.column.title);
     <input
       v-else
       ref="inputColTitleRef"
-      type="text"
       v-model="colTitle"
-      @keypress.enter="onUpdateTitle"
+      type="text"
       class="font-bold mb-4 p-1 max-w-[75%]"
+      @keypress.enter="onUpdateTitle"
     />
   </header>
 </template>
